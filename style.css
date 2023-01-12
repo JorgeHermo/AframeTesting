@@ -13,3 +13,22 @@
     background-color: blue;
     color: white;
 }
+
+#status {
+    position: absolute;
+    top: 20px;
+    left: 20px;
+    color: red
+}
+
+#right-button {
+    position: absolute;
+    bottom: 30px;
+    right: 80px
+}
+
+#left-button {
+    position: absolute;
+    bottom: 30px;
+    left: 80px
+}
