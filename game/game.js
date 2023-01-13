@@ -19,30 +19,33 @@ function startGame() {
     // remove the event listener
     gameStarted = true
     createPlayer()
-    //spawn obstacles every second
-    setInterval(spawnObstacle, 1000)
-    // checking for collisions
 }
 
 // Player set-up
 function createPlayer() {
-    let player = document.createElement("a-entity");
-    player.setAttribute("class", "player");
-    player.setAttribute("position", "0.1 0.4 -5");
-    player.setAttribute("scale", "0.5 0.5 0.5");
-    player.setAttribute("collision-detection", "");
-    player.setAttribute("movement-controls", "speed:5");
-    player.setAttribute("dynamic-body", "mass:5;");
-    player.setAttribute("geometry", "primitive: box");
-    player.setAttribute("material", "color: blue");
-    document.querySelector("a-scene").appendChild(player);
+    let player = document.createElement("a-entity")
+    player.setAttribute("class", "player")
+    player.setAttribute("position", "0.1 0.4 -5")
+    player.setAttribute("scale", "0.5 0.5 0.5")
+    player.setAttribute("collision-detection", "true")
+    player.setAttribute("movement-controls", "speed:5")
+    player.setAttribute("dynamic-body", "mass:5;")
+    player.setAttribute("geometry", "primitive: box")
+    player.setAttribute("material", "color: blue")
+    player.setAttribute("collider", "objects: .obstacle")
+    player.addEventListener("collide", function (event) {
+        console.log("Player collision")
+        handleCollision(event)
+    })
+    document.querySelector("a-scene").appendChild(player)
+    console.log("Player Position: " + player.getAttribute("position"))
 }
 
 function spawnObstacle() {
     if (!gameStarted) {
         return;
     }
-    let obstacle = document.createElement("a-box")
+    let obstacle = document.createElement("a-entity")
     let minX = -10
     let maxX = 10
     let x = (Math.random() * (maxX - minX)) + minX
@@ -51,36 +54,46 @@ function spawnObstacle() {
     let position = `${x} ${y} ${z}`
     obstacle.setAttribute("class", "obstacle")
     obstacle.setAttribute("position", position)
-    obstacle.setAttribute("color", "red")
     obstacle.setAttribute("scale", "0.5 0.5 0.5")
-    obstacle.setAttribute("collision-detection", "")
+    obstacle.setAttribute("collision-detection", "true")
     obstacle.setAttribute("dynamic-body", "mass: 20;")
+    obstacle.setAttribute("geometry", "primitive: box")
+    obstacle.setAttribute("material", "color: red")
     obstacle.setAttribute("animation", `property: position; to: ${x} -20 ${z}; dur: 10000; easing: linear`)
+    obstacle.setAttribute("collider", "objects: .player")
     document.querySelector("a-scene").appendChild(obstacle)
-    obstacle.addEventListener("collide", handleCollision)
-}
+    obstacle.addEventListener("collide", function (event) {
+        console.log("Obstacle collision")
+        handleCollision(event)
+    })
+    console.log("Obstacle Position: " + obstacle.getAttribute("position"))
+    console.log("Obstacle Created and Appended to the Scene");
+    console.log("Creating obstacle");
 
+}
 
 function handleCollision(event) {
     if (event.detail.body.el.classList.contains("player")) {
+        console.log("Player collided with", event.detail.body.el.classList)
+
         // code to handle player collision
-        console.log("Player collided with", event.detail.body.el.id);
-        lives--;
-        updateLives();
+        lives--
+        updateLives()
         if (lives === 0) {
-            endGame();
+            endGame()
         }
     } else if (event.detail.body.el.classList.contains("obstacle")) {
         // code to handle obstacle collision
-        console.log("Obstacle collided with", event.detail.body.el.id);
-        event.detail.body.el.parentNode.removeChild(event.detail.body.el);
+        console.log("Obstacle collided with", event.detail.body.el.classList)
+        event.detail.body.el.parentNode.removeChild(event.detail.body.el)
     }
 }
+
 
 function endGame() {
     gameStarted = false
     clearInterval(obstacleIntervalId)
-    let obstacles = document.querySelectorAll("a-box[color='red']")
+    let obstacles = document.querySelectorAll(".obstacle")
     obstacles.forEach(function (obstacle) {
         obstacle.parentNode.removeChild(obstacle)
     })
@@ -88,7 +101,6 @@ function endGame() {
     player.parentNode.removeChild(player)
     score = 0
     lives = 3
-    alert("game over your score is " + score)
 }
 
 function gameScore() {
@@ -108,32 +120,30 @@ let rightButton = document.querySelector("#right-button")
 rightButton.addEventListener("click", moveRight)
 
 function moveLeft() {
-    console.log("click izquierda");
     if (!gameStarted) {
         createPlayer();
     }
-    let player = document.querySelector(".player");
-    let currentPosition = player.getAttribute("position");
+    let player = document.querySelector(".player")
+    let currentPosition = player.getAttribute("position")
     let newPosition = {
         x: currentPosition.x - 0.5,
         y: currentPosition.y,
         z: currentPosition.z
-    };
-    player.setAttribute("position", newPosition);
+    }
+    player.setAttribute("position", newPosition)
 }
 
 
 function moveRight() {
-    console.log("click derecha");
     if (!gameStarted) {
-        createPlayer();
+        createPlayer()
     }
-    let player = document.querySelector(".player");
-    let currentPosition = player.getAttribute("position");
+    let player = document.querySelector(".player")
+    let currentPosition = player.getAttribute("position")
     let newPosition = {
         x: currentPosition.x + 0.5,
         y: currentPosition.y,
         z: currentPosition.z
-    };
-    player.setAttribute("position", newPosition);
+    }
+    player.setAttribute("position", newPosition)
 }

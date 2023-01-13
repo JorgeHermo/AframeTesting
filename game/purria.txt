@@ -1,0 +1,53 @@
+            if (
+                player.x < obstacle.x + obstacle.width &&
+                player.x + player.width > obstacle.x &&
+                player.y < obstacle.y + obstacle.height &&
+                player.y + player.height > obstacle.y
+            ) {
+                player.lives--;
+                if (player.lives <= 0) {
+                    console.log("game over");
+                    stopGame(gameLoopIntervalID);
+                } else {
+                    player.x = canvas.width / 2;
+                    player.y = canvas.height - 100
+                }
+                obstacle.x = Math.random() * canvas.width;
+                obstacle.y = 0
+            }
+
+            // function handleCollision(event) {
+//     if (event.detail.body.el.classList.contains("player")) {
+//         console.log("Player collided with", event.detail.body.el.classList)
+
+//         // code to handle player collision
+//         lives--
+//         updateLives()
+//         if (lives === 0) {
+//             endGame()
+//         }
+//     } else if (event.detail.body.el.classList.contains("obstacle")) {
+//         // code to handle obstacle collision
+//         console.log("Obstacle collided with", event.detail.body.el.classList)
+//         event.detail.body.el.parentNode.removeChild(event.detail.body.el)
+//     }
+// }
+
+function handleCollision(event) {
+    // Decrement the lives
+    lives--;
+    document.querySelector("#lives").innerHTML = `Lives: ${lives}`;
+
+    // change color of player
+    event.target.setAttribute("material", "color: red")
+
+    // wait 1s and change color of player back
+    setTimeout(() => {
+        event.target.setAttribute("material", "color: blue")
+    }, 1000);
+
+    if (lives <= 0) {
+        // End the game
+        endGame();
+    }
+}
